@@ -64,7 +64,7 @@
     <table width="50%" border="1">
       <tr>
         <td>选择月份</td>
-        <td><input name=starttime id=starttime style="CURSOR: text" readonly <%if(starttime!=null){%>value="<%=starttime%>"<%}else{%>value=""<%}%>>
+        <td><input name=starttime id=starttime style="CURSOR: text" <%if(starttime!=null){%>value="<%=starttime%>"<%}else{%>value=""<%}%>>
         <img src="images/date.gif" onClick="fPopUpCalendarDlg(starttime);return false" alt="选择日期"></td>
       </tr>
       <tr>
