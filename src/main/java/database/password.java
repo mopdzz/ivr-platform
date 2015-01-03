@@ -1,5 +1,8 @@
 package database;
 
+import org.springframework.jdbc.core.JdbcTemplate;
+import util.AppContextHolder;
+
 import java.io.*;
 import java.sql.Connection;
 import java.sql.Statement;
@@ -38,30 +41,16 @@ public class password {
 
     public static boolean insertsql(String id, ArrayList idlist, ArrayList nameList) {
         boolean back = false;
-        Connection conn = null;
-        Statement pstmt = null;
-        String sql = "";
+        JdbcTemplate jdbcTemplate = AppContextHolder.getContext().getBean("jdbcTemplate", JdbcTemplate.class);
+        String sql;
         try {
-            conn = MysqlConnect.newConnection();
-
-            pstmt = conn.createStatement();
-            conn.setAutoCommit(false);
             for (int i = 0; i < idlist.size(); ++i) {
                 sql = "insert into ivr_nine_password(passwordtypeid,cardnum,password) values('" + id + "','" + idlist.get(i) + "','" + nameList.get(i) + "');";
-                pstmt.addBatch(sql);
+                jdbcTemplate.execute(sql);
             }
-            pstmt.executeBatch();
-            conn.commit();
-            back = true;
-            boolean bool1 = back;
-            return bool1;
+            return true;
         } catch (Exception e) {
             back = false;
-            try {
-                conn.rollback();
-            } catch (Exception m) {
-                m.printStackTrace();
-            }
             e.printStackTrace();
         }
 

@@ -24,6 +24,7 @@ ArrayList namelist=new ArrayList();
  	    	idlist.add(rst.getString(1));
  	    	namelist.add(rst.getString(2));
  	     }
+        conn.close();
 	}catch(Exception e)
 	{
 		e.printStackTrace();

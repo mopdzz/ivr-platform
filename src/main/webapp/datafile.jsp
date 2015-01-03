@@ -11,10 +11,6 @@
         String type = request.getParameter("type");
         String sql="";
         String sql1="";
-    ///     System.out.println(starttime);
-    //     System.out.println(stoptime);
-    //     System.out.println(times+"1111111111111111111111111111111111111111111111111");
-    //     System.out.println(spnumber);
          if(time!=null&&!"".equals(time)&&type!=null&&!"".equals(type)){
          
          if("1".equals(type)){
@@ -209,8 +205,6 @@
          } 
       }
       String backurl="menu1.jsp?starttime="+starttime+"&endtime="+endtime+"&time="+time;
-   
-    //  System.out.println(sql);
 
 %>
 <html>
@@ -292,11 +286,21 @@
 
  %>
   </tr>
-  <%
+  <%         
+  						
+                      conn.close();
+                    pstmt=null;
+                    rst=null;          
             }
             catch (Exception e){
             e.printStackTrace();
             }
+       finally {
+	      pstmt = null;
+	      conn = null;
+	      rst=null;
+	      
+	    }
 	    }
     
   %>

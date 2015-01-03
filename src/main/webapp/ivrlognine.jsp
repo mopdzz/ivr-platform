@@ -18,8 +18,6 @@
 	        starttime=starttime.trim();
 	        endtime=endtime.trim();
 			succ=Getpasswordnine.insertlog(phone,called,starttime,endtime);
-
-			
 		}
 		sendhttpfile=sendhttpfile+"=="+succ;
 		Getpasswordnine.writeComLog(gethttpfile, PropertyUtils.getPropertyUtils().getProperty("ivrlog"));

@@ -44,6 +44,8 @@
                             } 
                          }
                     }
+                    conn.close();
+                    pstmt=null;
                   if(isint!=1)
                      {
                      isint=2;
@@ -55,6 +57,11 @@
           //  response.sendRedirect("scuowu.jsp?id=1&name="+name); 
             w.printStackTrace();
         }
+	  finally {
+	      pstmt = null;
+	      conn = null;
+	      rst=null;
+	    }
         }
         }
      //   System.out.println("#################################"+isint);

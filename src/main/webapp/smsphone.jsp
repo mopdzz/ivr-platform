@@ -68,6 +68,7 @@
           while(rst.next()){
         	  list.add(rst.getString(1));
           }
+           conn.close();
  			}
  		catch (Exception e){
  			e.printStackTrace();

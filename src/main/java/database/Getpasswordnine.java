@@ -1,5 +1,9 @@
 package database;
 
+import com.yangl.common.StringUtils;
+import org.springframework.jdbc.core.JdbcTemplate;
+import util.AppContextHolder;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -8,6 +12,8 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 public class Getpasswordnine {
 //    public static String getpassfile = "e:/log/9_ninegetpass.txt";
@@ -15,44 +21,29 @@ public class Getpasswordnine {
 //    public static String error = "e:/log/9_nineerror.txt";
 
     public static String getPass(String phone, String called, String passwordtypeid) {
-        Statement pstmt = null;
-        ResultSet rst = null;
-        Connection conn = null;
         String str = null;
-        String strone = null;
+        JdbcTemplate jdbcTemplate = AppContextHolder.getContext().getBean("jdbcTemplate", JdbcTemplate.class);
         try {
             int provinceid = issheng(phone);
             String sql = "select id,cardnum,password from ivr_nine_password where state >0 and passwordtypeid=" +
                     passwordtypeid + " ORDER BY rand() LIMIT 1 ";
+            String id = null;
 
-            conn = MysqlConnect.getConncet();
-
-            if (conn != null) {
-                pstmt = conn.createStatement();
-                rst = pstmt.executeQuery(sql);
-                String id = "";
-
-                int i = 0;
-                while (rst.next()) {
-                    ++i;
-                    id = rst.getString(1);
-                    str = rst.getString(2) + "," + rst.getString(3);
-                    strone = rst.getString(3);
+            List<Map<String, Object>> list = jdbcTemplate.queryForList(sql);
+            if(list != null && list.size() > 0){
+                for(Map<String, Object> rs : list){
+                    id = rs.get("id").toString();
+                    str = rs.get("cardnum").toString() + "," + rs.get("password").toString();
                 }
-                if (i > 0) {
-                    sql = "update ivr_nine_password set phone='" + phone +
-                            "', callednumber='" + called + "' ,provinceid='" +
-                            provinceid +
-                            "',inserttime=now()  ,state=0 where  id=" + id;
-                    System.out.println(sql);
-                    pstmt.execute(sql);
-                } else {
-                    return null;
-                }
-
-            } else {
-                return null;
             }
+            if(StringUtils.isNotBlank(id)){
+                sql = "update ivr_nine_password set phone='" + phone +
+                        "', callednumber='" + called + "' ,provinceid='" +
+                        provinceid +
+                        "',inserttime=now()  ,state=0 where  id=" + id;
+                jdbcTemplate.execute(sql);
+            }
+
             return str;
         } catch (Exception w) {
             writeComLog(w.getMessage(), PropertyUtils.getPropertyUtils().getProperty("nineerror"));
@@ -82,17 +73,11 @@ public class Getpasswordnine {
     }
 
     public static boolean insertlog(String phone, String called, String starttime, String endtime) {
-        Statement pstmt = null;
-        ResultSet rst = null;
-        Connection conn = null;
-        String str = null;
-
         String strstart = gettime(starttime);
         String strend = gettime(endtime);
         String fee = String.valueOf((todate(strstart, strend) / 60L + 1L) * 100L);
         int province = issheng(phone);
 
-        boolean isback = false;
         try {
             String sql = "insert into ivr_nine_usertj(phone,callednumber,starttime,endtime,fee,provinceid) values('" +
                     phone +
@@ -102,26 +87,16 @@ public class Getpasswordnine {
                     strstart +
                     "','" +
                     strend + "','" + fee + "','" + province + "')";
-            conn = MysqlConnect.getConncet();
 
-            if (conn != null) {
-                pstmt = conn.createStatement();
+            JdbcTemplate jdbcTemplate = AppContextHolder.getContext().getBean("jdbcTemplate", JdbcTemplate.class);
+            jdbcTemplate.execute(sql);
 
-                pstmt.execute(sql);
-                isback = true;
-
-                pstmt = null;
-                rst = null;
-            } else {
-                return false;
-            }
-
-            return isback;
+            return true;
         } catch (Exception w) {
             writeComLog(w.getMessage(), PropertyUtils.getPropertyUtils().getProperty("nineerror"));
             w.printStackTrace();
         }
-        return isback;
+        return false;
     }
 
     public static String gettime(String time) {
@@ -132,29 +107,14 @@ public class Getpasswordnine {
     }
 
     public static boolean issp(String called, String sppassword) {
-        Statement pstmt = null;
-        ResultSet rst = null;
-        Connection conn = null;
         int num = 0;
         try {
             String sql = "select count(*) from ivr_nine_spnumber where spnumber ='" + called + "' and sppassword='" +
                     sppassword + "' ";
-            conn = MysqlConnect.getConncet();
+            JdbcTemplate jdbcTemplate = AppContextHolder.getContext().getBean("jdbcTemplate", JdbcTemplate.class);
+            num = jdbcTemplate.queryForInt(sql);
 
-            if (conn != null) {
-                pstmt = conn.createStatement();
-
-                rst = pstmt.executeQuery(sql);
-                String id = "";
-
-                while (rst.next()) {
-                    num = rst.getInt(1);
-                }
-
-                return (num > 0);
-            }
-
-            return false;
+            return num > 0;
         } catch (Exception w) {
             writeComLog(w.getMessage(), PropertyUtils.getPropertyUtils().getProperty("nineerror"));
             w.printStackTrace();
@@ -173,21 +133,13 @@ public class Getpasswordnine {
             String hd = phone.substring(0, 7);
 
             String sql = "select a.id from ivr_province a ,ivr_hd b where b.hd='" + hd + "' and a.province=b.sheng";
-            conn = MysqlConnect.getConncet();
-            int i;
-            if (conn != null) {
-                pstmt = conn.createStatement();
-
-                rst = pstmt.executeQuery(sql);
-
-                while (rst.next()) {
-                    a = rst.getInt(1);
+            JdbcTemplate jdbcTemplate = AppContextHolder.getContext().getBean("jdbcTemplate", JdbcTemplate.class);
+            List<Map<String, Object>> list = jdbcTemplate.queryForList(sql);
+            if(list != null & list.size() > 0){
+                for(Map<String, Object> rs : list){
+                    a = Integer.parseInt(rs.get("id").toString());
                 }
-
-                i = a;
-                return i;
             }
-            return a;
         } catch (Exception w) {
             writeComLog(w.getMessage(), PropertyUtils.getPropertyUtils().getProperty("nineerror"));
             w.printStackTrace();

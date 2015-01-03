@@ -294,6 +294,7 @@
             		out.println("<td>" + all2 + "</td>");
             		out.println("<td>" + "</td>");
             		out.println("<td>" + d + "</td>");
+            		conn.close();
             	} catch (Exception e) {
             		e.printStackTrace();
             	}

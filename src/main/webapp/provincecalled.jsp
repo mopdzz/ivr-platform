@@ -178,6 +178,7 @@
             out.println("<td>"+allnum2+"</td>");
             out.println("<td>"+allnum+"</td>");
             out.println("<td>"+d+"</td>");
+                    conn.close();
             }
             catch (Exception e){
             e.printStackTrace();

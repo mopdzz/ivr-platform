@@ -75,6 +75,7 @@
   	    		out.println("<td>0</td>");
   	    	}
   	    }
+                    conn.close();
             }
             catch (Exception e){
             e.printStackTrace();

@@ -1,5 +1,8 @@
 package database;
 
+import org.springframework.jdbc.core.JdbcTemplate;
+import util.AppContextHolder;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
@@ -10,9 +13,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Hashtable;
+import java.util.*;
 
 public class pingbi {
 
@@ -50,35 +51,21 @@ public class pingbi {
     }
 
     public static ArrayList getzifulist() {
-        boolean back = false;
-        Connection conn = null;
-        Statement pstmt = null;
-        ResultSet rst = null;
-        String sql = "";
+        String sql = null;
         ArrayList arrayList = new ArrayList();
         try {
-            conn = MysqlConnect.newConnection();
-
-            pstmt = conn.createStatement();
             sql = "SELECT zifu  from ivr_minganzifu;";
-            ResultSet resultSet = pstmt.executeQuery(sql);
-            while (resultSet.next()) {
-                String string = resultSet.getString(1);
-                if (string != null) {
-                    arrayList.add(string);
+
+            JdbcTemplate jdbcTemplate = AppContextHolder.getContext().getBean("jdbcTemplate", JdbcTemplate.class);
+            List<Map<String, Object>> list = jdbcTemplate.queryForList(sql);
+            if(list != null && list.size() > 0){
+                for(Map<String, Object> rs : list){
+                    arrayList.add(rs.get("zifu").toString());
                 }
             }
-
-            back = true;
             return arrayList;
         } catch (Exception e) {
             writeComLog(e.getMessage(), PropertyUtils.getPropertyUtils().getProperty("pingbierror"));
-            back = false;
-            try {
-                conn.rollback();
-            } catch (Exception m) {
-                m.printStackTrace();
-            }
             e.printStackTrace();
         }
 

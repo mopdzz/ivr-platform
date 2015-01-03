@@ -196,12 +196,11 @@
             out.println("<td>"+allnum4+"</td>");
             out.println("<td>"+allnum+"</td>");
             out.println("<td>"+d+"</td>");
+                    conn.close();
             }
             catch (Exception e){
             e.printStackTrace();
             }
-	//    System.out.print(sql);
-	//    }
   %>
 </table>
 <p align="center"><a href="calledtime.jsp">·µ»Ø</a></p>
