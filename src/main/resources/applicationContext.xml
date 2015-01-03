@@ -23,9 +23,9 @@
           destroy-method="close">
         <!-- Connection Info -->
         <property name="driverClass" value="com.mysql.jdbc.Driver"/>
-        <property name="jdbcUrl" value="jdbc:mysql://139.159.0.226:3301/ivr?useUnicode=true&amp;autoReconnect=true&amp;characterEncoding=utf-8"/>
-        <property name="user" value="ivruser"/>
-        <property name="password" value="skyd@ivruser"/>
+        <property name="jdbcUrl" value="jdbc:mysql://127.0.0.1:3301/ivr?useUnicode=true&amp;autoReconnect=true&amp;characterEncoding=utf-8"/>
+        <property name="user" value=""/>
+        <property name="password" value=""/>
 
         <!-- Connection Pooling Info -->
         <property name="minPoolSize" value="2"/>
