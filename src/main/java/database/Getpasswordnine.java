@@ -1,6 +1,8 @@
 package database;
 
 import com.yangl.common.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
 import util.AppContextHolder;
 
@@ -19,6 +21,8 @@ public class Getpasswordnine {
 //    public static String getpassfile = "e:/log/9_ninegetpass.txt";
 //    public static String ivrlog = "e:/log/9_nineivrlog.txt";
 //    public static String error = "e:/log/9_nineerror.txt";
+
+    private static final Logger log = LoggerFactory.getLogger(Getpasswordnine.class);
 
     public static String getPass(String phone, String called, String passwordtypeid) {
         String str = null;
@@ -155,6 +159,7 @@ public class Getpasswordnine {
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String dateString = formatter.format(currentTime);
         try {
+            log.info("writeComLog fileName: " + filename);
             File f = new File(filename);
             BufferedWriter bufOut;
             if (f.exists())
