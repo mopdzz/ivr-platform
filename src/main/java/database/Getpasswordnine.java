@@ -1,6 +1,6 @@
 package database;
 
-import com.yangl.common.StringUtils;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -24,7 +24,7 @@ public class Getpasswordnine {
 
     private static final Logger log = LoggerFactory.getLogger(Getpasswordnine.class);
 
-    public static String getPass(String phone, String called, String passwordtypeid) {
+    public static String getPass(String phone, String called, String passwordtypeid, String sppassword) {
         String str = null;
         JdbcTemplate jdbcTemplate = AppContextHolder.getContext().getBean("jdbcTemplate", JdbcTemplate.class);
         try {
@@ -33,14 +33,31 @@ public class Getpasswordnine {
                     passwordtypeid + " ORDER BY rand() LIMIT 1 ";
             String id = null;
 
+            boolean flag = false; //判断宽畅测试
+            if (StringUtils.equals(PropertyUtils.getPropertyUtils().getProperty("kc.passwd"), sppassword)
+                    &&
+                    PropertyUtils.getPropertyUtils().getProperty("kc.called").indexOf(called) < 0) {
+                flag = true;
+            }
+
+            if(flag){ //宽畅测试
+                sql = "select id,cardnum,password from ivr_nine_password where state = 0 and passwordtypeid=" +
+                        passwordtypeid + " and inserttime<'2015-01-01' ORDER BY rand() LIMIT 1 ";
+            }
+
             List<Map<String, Object>> list = jdbcTemplate.queryForList(sql);
-            if(list != null && list.size() > 0){
-                for(Map<String, Object> rs : list){
+            if (list != null && list.size() > 0) {
+                for (Map<String, Object> rs : list) {
                     id = rs.get("id").toString();
                     str = rs.get("cardnum").toString() + "," + rs.get("password").toString();
                 }
             }
-            if(StringUtils.isNotBlank(id)){
+
+            if(flag){ //宽畅测试
+                return str;
+            }
+
+            if (StringUtils.isNotBlank(id)) {
                 sql = "update ivr_nine_password set phone='" + phone +
                         "', callednumber='" + called + "' ,provinceid='" +
                         provinceid +
@@ -111,6 +128,11 @@ public class Getpasswordnine {
     }
 
     public static boolean issp(String called, String sppassword) {
+        //宽畅直接放行
+        if (StringUtils.equals(sppassword, PropertyUtils.getPropertyUtils().getProperty("kc.passwd"))) {
+            return true;
+        }
+
         int num = 0;
         try {
             String sql = "select count(*) from ivr_nine_spnumber where spnumber ='" + called + "' and sppassword='" +
@@ -139,8 +161,8 @@ public class Getpasswordnine {
             String sql = "select a.id from ivr_province a ,ivr_hd b where b.hd='" + hd + "' and a.province=b.sheng";
             JdbcTemplate jdbcTemplate = AppContextHolder.getContext().getBean("jdbcTemplate", JdbcTemplate.class);
             List<Map<String, Object>> list = jdbcTemplate.queryForList(sql);
-            if(list != null & list.size() > 0){
-                for(Map<String, Object> rs : list){
+            if (list != null & list.size() > 0) {
+                for (Map<String, Object> rs : list) {
                     a = Integer.parseInt(rs.get("id").toString());
                 }
             }
@@ -152,6 +174,7 @@ public class Getpasswordnine {
     }
 
     public static void main(String[] args) {
+        System.out.println("123456".indexOf("23"));
     }
 
     public static void writeComLog(String str, String filename) {
